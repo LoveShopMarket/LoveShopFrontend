@@ -1,20 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { UserLoginDto } from '@/dtos/userLogin'
 
 const router = useRouter()
-const username = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const errors = reactive({
+  email: '',
+  password: [] as string[]
+})
 
 const handleRegister = () => {
-  if (password.value !== confirmPassword.value) {
-    alert('Пароли не совпадают!')
-    return
+  errors.email = ''
+  errors.password = []
+  const user = UserLoginDto.create(
+    email.value,
+    password.value,
+    confirmPassword.value
+  );
+
+  if (!user.isSuccess) {
+    const emailErrors = user.getErrors.filter(e => e.name === 'EmailError').map(e => e.message);
+    errors.password  = user.getErrors.filter(e => e.name === 'PasswordError').map(e => e.message);
+    errors.email = emailErrors.join('; ');
+    return;
   }
+
   console.log('Register:', {
-    username: username.value,
     email: email.value,
     password: password.value,
   })
@@ -32,22 +46,12 @@ const goBack = () => {
 
       <form @submit.prevent="handleRegister" class="space-y-4">
         <div>
-          <label for="username" class="block text-gray-700 font-bold mb-2">Имя пользователя</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="your_name"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
-            required
-          />
-        </div>
-
-        <div>
           <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
+          <span v-if="errors.email" class="text-red-500 text-sm">{{ errors.email }}</span>
           <input
             id="email"
             v-model="email"
+            :class="['input', errors.email ? 'border-red-500' : 'border-gray-300']"
             type="email"
             placeholder="your@email.com"
             class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
@@ -57,9 +61,17 @@ const goBack = () => {
 
         <div>
           <label for="password" class="block text-gray-700 font-bold mb-2">Пароль</label>
+          <span
+            v-for="err in errors.password"
+            :key="err"
+            class="text-red-500 text-sm block"
+          >
+            {{ err }}
+          </span>
           <input
             id="password"
             v-model="password"
+            :class="['input', errors.password ? 'border-red-500' : 'border-gray-300']"
             type="password"
             placeholder="••••••••"
             class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
