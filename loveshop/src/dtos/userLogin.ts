@@ -19,15 +19,7 @@ export class UserLoginDto {
     }
     if (!password || password.trim() === '') {
       errors.push(new PasswordError('Пароль не может быть пустым'));
-    } else if (password.length < 6) {
-      errors.push(new PasswordError('Пароль должен быть не менее 6 символов'));
-    }
-    if (!/[A-Z]/.test(password)) {
-        errors.push(new PasswordError('Пароль должен содержать хотя бы одну заглавную английскую букву'));
-      }
-    if (!/[a-z]/.test(password)) {
-        errors.push(new PasswordError('Пароль должен содержать хотя бы одну строчную английскую букву'));
-      }
+    } 
     if (confirmPassword && password !== confirmPassword) {
       errors.push(new PasswordError('Пароли не совпадают'));
     }
