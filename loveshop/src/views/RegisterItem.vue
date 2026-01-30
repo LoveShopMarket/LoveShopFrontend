@@ -27,11 +27,6 @@ const handleRegister = () => {
     errors.email = emailErrors.join('; ');
     return;
   }
-
-  console.log('Register:', {
-    email: email.value,
-    password: password.value,
-  })
 }
 
 const goBack = () => {
