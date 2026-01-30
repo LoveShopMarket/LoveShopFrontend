@@ -13,8 +13,6 @@ const errors = reactive({
 })
 
 const handleRegister = () => {
-  errors.email = ''
-  errors.password = []
   const user = UserLoginDto.create(
     email.value,
     password.value,
@@ -27,6 +25,11 @@ const handleRegister = () => {
     errors.email = emailErrors.join('; ');
     return;
   }
+  else {
+    errors.email = ''
+    errors.password = []
+  }
+
 }
 
 const goBack = () => {
