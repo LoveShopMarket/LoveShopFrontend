@@ -1,4 +1,4 @@
-class Result<T> {
+export class Result<T> {
   private success: boolean;
   private errors: Error[];
   private value?: T;
@@ -30,4 +30,3 @@ class Result<T> {
   }
 }
 
-export default Result;
