@@ -13,6 +13,7 @@ const { email, password, error, submit, goBack } = useLoginForm();
         <div>
           <label class="block text-gray-700 font-bold mb-2">Email</label>
           <input
+            for="email"
             v-model="email"
             type="email"
             placeholder="your@email.com"
@@ -25,6 +26,7 @@ const { email, password, error, submit, goBack } = useLoginForm();
           <label class="block text-gray-700 font-bold mb-2">Пароль</label>
           <input
             v-model="password"
+            for="password"
             type="password"
             placeholder="••••••••"
             class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"

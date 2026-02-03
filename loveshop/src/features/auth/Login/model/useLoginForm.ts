@@ -9,13 +9,8 @@ export function useLoginForm() {
   const error = ref('');
 
   const submit = async () => {
-    try {
       await login(email.value, password.value);
       // router.push('/product'); // будущая страница
-    } catch (e) {
-      error.value = 'Ошибка логина. Проверьте email и пароль.';
-      console.error(e);
-    }
   };
 
   const goBack = () => router.back();

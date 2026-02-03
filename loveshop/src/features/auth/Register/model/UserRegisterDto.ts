@@ -2,7 +2,7 @@ import { PasswordError } from "@/shared/Errors/PasswordError";
 import {Result} from "@/shared/lib/Result";
 
 export class UserRegisterDto {
-  constructor(
+  private constructor(
     public email: string,
     public password: string,
     public confirmPassword: string
