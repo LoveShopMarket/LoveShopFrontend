@@ -12,12 +12,11 @@ export function useRegisterForm() {
   const password = ref('')
   const confirmPassword = ref('')
   const errors = reactive({
-    email: '',
     password: [] as string[]
   })
 
   const submit = async () => {
-    submitted.value = true
+
     const result = UserRegisterDto.create(
       email.value,
       password.value,
@@ -25,7 +24,6 @@ export function useRegisterForm() {
     )
 
     if (!result.isSuccess) {
-      errors.email = ''
       errors.password = []
 
       result.getErrors.forEach(err => {
@@ -38,6 +36,7 @@ export function useRegisterForm() {
     const Dto = result.getValue!
 
     await register(Dto.email, Dto.password)
+    submitted.value = true
     router.back()
   }
 
