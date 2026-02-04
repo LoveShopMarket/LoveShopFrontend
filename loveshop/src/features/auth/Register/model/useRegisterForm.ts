@@ -1,4 +1,4 @@
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { UserRegisterDTO as UserRegisterDTO } from './UserRegisterDTO'
 import { register } from '../api/registerApi'
@@ -11,9 +11,7 @@ export function useRegisterForm() {
   const email = ref('')
   const password = ref('')
   const confirmPassword = ref('')
-  const errors = reactive({
-    error: [] as string[]
-  })
+  const errors = ref<string[]>([])
 
   const submit = async () => {
 
@@ -24,11 +22,11 @@ export function useRegisterForm() {
     )
 
     if (!userRegisterDTO.isSuccess) {
-      errors.error = []
+      errors.value = []
 
       userRegisterDTO.getErrors.forEach(err => {
         if (err instanceof PasswordError) {
-          errors.error.push(err.message)
+          errors.value.push(err.message)
         }
       })
       return
@@ -41,10 +39,8 @@ export function useRegisterForm() {
       router.back()
     }
     else {
-      errors.error = []
-      registerResult.getErrors.forEach(err => {
-          errors.error.push(err.message)
-      })
+      errors.value = []
+      errors.value = registerResult.getErrors.map(err => err.message);
     }
   }
 
