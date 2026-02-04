@@ -2,7 +2,6 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 import { login } from '../api/loginApi';
 
-
 export function useLoginForm() {
   const router = useRouter();
   const email = ref('');
