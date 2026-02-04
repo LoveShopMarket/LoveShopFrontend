@@ -14,7 +14,6 @@ export function useLoginForm() {
       goBack()
     }
     else {
-      errors.value = []
       errors.value = loginResult.getErrors.map(err => err.message);
     }
   }

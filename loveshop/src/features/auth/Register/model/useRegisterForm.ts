@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserRegisterDTO as UserRegisterDTO } from './UserRegisterDTO'
+import { UserRegisterDTO } from './UserRegisterDTO'
 import { register } from '../api/registerApi'
 import { PasswordError } from '@/shared/Errors/PasswordError'
 
@@ -39,7 +39,6 @@ export function useRegisterForm() {
       router.back()
     }
     else {
-      errors.value = []
       errors.value = registerResult.getErrors.map(err => err.message);
     }
   }
