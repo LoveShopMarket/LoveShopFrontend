@@ -1,10 +1,10 @@
-export class UserLoginDto {
+export class UserLoginDTO {
   private constructor(
     public email: string,
     public password: string
   ) {}
 
-  static create(email: string, password: string): UserLoginDto {
-    return new UserLoginDto(email, password);
+  static create(email: string, password: string): UserLoginDTO {
+    return new UserLoginDTO(email, password);
   }
 }
