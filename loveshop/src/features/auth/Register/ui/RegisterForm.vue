@@ -1,48 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRegisterForm } from '../model/useRegisterForm'
 
-const router = useRouter()
-const username = ref('')
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
-
-const handleRegister = () => {
-  if (password.value !== confirmPassword.value) {
-    alert('Пароли не совпадают!')
-    return
-  }
-  console.log('Register:', {
-    username: username.value,
-    email: email.value,
-    password: password.value,
-  })
-}
-
-const goBack = () => {
-  router.back()
-}
+const {
+  email,
+  password,
+  confirmPassword,
+  errors,
+  submitted,
+  submit,
+  goBack
+} = useRegisterForm()
 </script>
-
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Регистрация</h2>
 
-      <form @submit.prevent="handleRegister" class="space-y-4">
-        <div>
-          <label for="username" class="block text-gray-700 font-bold mb-2">Имя пользователя</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="your_name"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
-            required
-          />
-        </div>
-
+      <form @submit.prevent="submit" class="space-y-4">
+        <span
+            v-for="err in errors.error"
+            :key="err"
+            class="text-red-500 text-sm block"
+          >
+            {{ err }}
+          </span>
         <div>
           <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
           <input
@@ -60,6 +41,7 @@ const goBack = () => {
           <input
             id="password"
             v-model="password"
+            :class="['input', submitted && errors.password.length ? 'border-red-500' : 'border-gray-300']"
             type="password"
             placeholder="••••••••"
             class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"

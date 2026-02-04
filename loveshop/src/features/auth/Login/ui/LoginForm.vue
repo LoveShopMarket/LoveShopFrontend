@@ -1,18 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useLoginForm } from '../model/useLoginForm';
 
-const router = useRouter()
-const email = ref('')
-const password = ref('')
-
-const handleLogin = () => {
-  console.log('Login:', { email: email.value, password: password.value })
-}
-
-const goBack = () => {
-  router.back()
-}
+const { email, password, errors, submit, goBack } = useLoginForm();
 </script>
 
 <template>
@@ -20,11 +9,18 @@ const goBack = () => {
     <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Вход</h2>
 
-      <form @submit.prevent="handleLogin" class="space-y-4">
+      <form @submit.prevent="submit" class="space-y-4">
+         <span
+            v-for="err in errors.error"
+            :key="err"
+            class="text-red-500 text-sm block"
+          >
+            {{ err }}
+          </span>
         <div>
-          <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
+          <label class="block text-gray-700 font-bold mb-2">Email</label>
           <input
-            id="email"
+            for="email"
             v-model="email"
             type="email"
             placeholder="your@email.com"
@@ -34,16 +30,17 @@ const goBack = () => {
         </div>
 
         <div>
-          <label for="password" class="block text-gray-700 font-bold mb-2">Пароль</label>
+          <label class="block text-gray-700 font-bold mb-2">Пароль</label>
           <input
-            id="password"
             v-model="password"
+            for="password"
             type="password"
             placeholder="••••••••"
             class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             required
           />
         </div>
+
 
         <button
           type="submit"
