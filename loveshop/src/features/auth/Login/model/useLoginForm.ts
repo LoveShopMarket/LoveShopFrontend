@@ -13,8 +13,6 @@ export function useLoginForm() {
   })
   const submit = async () => {
     const loginResult = await login(email.value, password.value);
-    console.log('hui')
-    console.log(loginResult.getErrors[0].message)
     if (loginResult.isSuccess) {
       goBack()
     }
