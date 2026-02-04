@@ -1,6 +1,6 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserRegisterDto } from './UserRegisterDto'
+import { UserRegisterDTO as UserRegisterDTO } from './UserRegisterDTO'
 import { register } from '../api/registerApi'
 import { PasswordError } from '@/shared/Errors/PasswordError'
 
@@ -12,32 +12,40 @@ export function useRegisterForm() {
   const password = ref('')
   const confirmPassword = ref('')
   const errors = reactive({
-    password: [] as string[]
+    error: [] as string[]
   })
 
   const submit = async () => {
 
-    const result = UserRegisterDto.create(
+    const userRegisterDTO = UserRegisterDTO.create(
       email.value,
       password.value,
       confirmPassword.value
     )
 
-    if (!result.isSuccess) {
-      errors.password = []
+    if (!userRegisterDTO.isSuccess) {
+      errors.error = []
 
-      result.getErrors.forEach(err => {
+      userRegisterDTO.getErrors.forEach(err => {
         if (err instanceof PasswordError) {
-          errors.password.push(err.message)
+          errors.error.push(err.message)
         }
       })
       return
     }
-    const Dto = result.getValue!
+    const userRegisterDTOValue = userRegisterDTO.getValue!
 
-    await register(Dto.email, Dto.password)
-    submitted.value = true
-    router.back()
+    const registerResult = await register(userRegisterDTOValue.email, userRegisterDTOValue.password)
+    if (registerResult.isSuccess) {
+      submitted.value = true
+      router.back()
+    }
+    else {
+      errors.error = []
+      registerResult.getErrors.forEach(err => {
+          errors.error.push(err.message)
+      })
+    }
   }
 
   const goBack = () => router.back()
