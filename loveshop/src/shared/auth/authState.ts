@@ -1,9 +1,16 @@
-import { ref } from 'vue';
-
-export const accessToken = ref('');
-export const isAuthenticated = ref(false);
+let accessToken = '';
 
 export function setToken(token: string) {
-  accessToken.value = token;
-  isAuthenticated.value = !!token;
+  accessToken = token;
+}
+
+export function getToken(){
+  if (isAuthenticated()) {
+    return accessToken;
+  }
+  return null;
+}
+
+function isAuthenticated(){
+   return !!accessToken;
 }
