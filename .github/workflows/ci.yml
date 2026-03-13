@@ -29,8 +29,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # ВАЖНО: Убираем cache-dependency-path, если файл не найден
-          # cache: 'npm'  # Временно отключаем кэш для диагностики
 
       - name: Install dependencies
         working-directory: ./loveshop
