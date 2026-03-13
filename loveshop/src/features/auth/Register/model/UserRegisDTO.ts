@@ -1,5 +1,5 @@
 import { PasswordError } from "@/shared/Errors/PasswordError";
-import {Result} from "@/shared/lib/Result";
+import { Result } from "@/shared/lib/Result";
 
 export class UserRegisterDTO {
   private constructor(
