@@ -1,0 +1,21 @@
+services:
+  vue-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # Монтируем исходный код, чтобы изменения на хосте попадали в контейнер
+      - .:/app
+      # Исключаем node_modules контейнера, чтобы не затереть их папкой с хоста
+      - /app/node_modules
+    develop:
+      watch:
+        # Следим за изменениями в исходниках и синхронизируем
+        - path: ./src
+          action: sync
+          target: /app/src
+        # Если изменились зависимости, пересобираем образ
+        - path: package.json
+          action: rebuild
