@@ -1,4 +1,4 @@
-name: CI for Vue
+name: CI/CD Vue
 
 on:
   pull_request:

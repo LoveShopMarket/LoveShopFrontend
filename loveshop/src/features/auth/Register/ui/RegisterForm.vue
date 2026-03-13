@@ -17,13 +17,15 @@ const {
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Регистрация</h2>
 
       <form @submit.prevent="submit" class="space-y-4">
-        <span
-            v-for="err in errors.error"
-            :key="err"
+         <div v-if="errors.length > 0" class="bg-red-50 border border-red-200 rounded p-3 mb-4">
+          <span
+            v-for="(err, index) in errors"
+            :key="index"
             class="text-red-500 text-sm block"
           >
             {{ err }}
           </span>
+        </div>
         <div>
           <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
           <input
@@ -41,7 +43,8 @@ const {
           <input
             id="password"
             v-model="password"
-            :class="['input', submitted && errors.password.length ? 'border-red-500' : 'border-gray-300']"
+           :class="['w-full px-4 py-2 border rounded focus:outline-none focus:border-green-500',
+                     submitted && errors.length > 0 ? 'border-red-500' : 'border-gray-300']"
             type="password"
             placeholder="••••••••"
             class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"

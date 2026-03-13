@@ -15,11 +15,11 @@ export async function login(email: string, password: string): Promise<Result<Log
           const errorsObject = error.response?.data.detail
           return Result.fail<boolean>([new Error(errorsObject)])
         }
-        return Result.fail<LoginResponse>([new Error('Unknown error')])
+        return Result.fail<LoginResponse>([new Error(errorsObject || 'Ошибка входа')])
       })
-    if (response.isSuccess) {
-      const value = response.getValue!
-      setToken(value.accessToken)
+   if (response.isSuccess && response.getValue) {
+      const value = response.getValue as LoginResponse; 
+      setToken(value.accessToken);
     }
     return response;
 };
