@@ -22,8 +22,8 @@ jobs:
           echo "📂 Full structure:"
           find . -type f -name "package*.json" | sort
           echo "📂 Checking vue-project specifically:"
-          ls -la vue-project/ || echo "❌ vue-project folder not found!"
-          ls -la vue-project/package*.json || echo "❌ No package files in vue-project!"
+          ls -la loveshop/ || echo "❌ vue-project folder not found!"
+          ls -la loveshop/package*.json || echo "❌ No package files in vue-project!"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
