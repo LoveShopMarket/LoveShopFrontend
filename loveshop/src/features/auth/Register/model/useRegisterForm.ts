@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserRegisterDTO } from './UserRegisterDto'
+import { UserRegisterDTO } from './UserRegisterDTO'
 import { register } from '../api/registerApi'
 import { PasswordError } from '@/shared/Errors/PasswordError'
 

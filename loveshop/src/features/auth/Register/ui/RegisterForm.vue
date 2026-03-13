@@ -17,7 +17,7 @@ const {
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Регистрация</h2>
 
       <form @submit.prevent="submit" class="space-y-4">
-         <div v-if="errors.length > 0" class="bg-red-50 border border-red-200 rounded p-3 mb-4">
+         <div v-if="errors.length > 0" class="bg-red-50 border border-red-500 rounded-md p-3 mb-4">
           <span
             v-for="(err, index) in errors"
             :key="index"
@@ -33,7 +33,7 @@ const {
             v-model="email"
             type="email"
             placeholder="your@email.com"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-green-500"
             required
           />
         </div>
@@ -43,11 +43,11 @@ const {
           <input
             id="password"
             v-model="password"
-           :class="['w-full px-4 py-2 border rounded focus:outline-none focus:border-green-500',
+           :class="['w-full px-4 py-2 border rounded-md focus:outline-none focus:border-green-500',
                      submitted && errors.length > 0 ? 'border-red-500' : 'border-gray-300']"
             type="password"
             placeholder="••••••••"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-green-500"
             required
           />
         </div>
@@ -61,14 +61,14 @@ const {
             v-model="confirmPassword"
             type="password"
             placeholder="••••••••"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-green-500"
             required
           />
         </div>
 
         <button
           type="submit"
-          class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition"
+          class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition"
         >
           Зарегистрироваться
         </button>
@@ -76,7 +76,7 @@ const {
 
       <button
         @click="goBack"
-        class="w-full mt-4 bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition"
+        class="w-full mt-4 bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition"
       >
         Назад
       </button>
