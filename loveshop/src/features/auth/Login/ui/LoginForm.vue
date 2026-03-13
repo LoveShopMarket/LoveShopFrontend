@@ -10,13 +10,15 @@ const { email, password, errors, submit, goBack } = useLoginForm();
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Вход</h2>
 
       <form @submit.prevent="submit" class="space-y-4">
-         <span
-            v-for="err in errors.error"
-            :key="err"
+         <template v-if="errors.length > 0">
+          <span
+            v-for="(err, index) in errors"
+            :key="index"
             class="text-red-500 text-sm block"
           >
             {{ err }}
           </span>
+        </template>
         <div>
           <label class="block text-gray-700 font-bold mb-2">Email</label>
           <input

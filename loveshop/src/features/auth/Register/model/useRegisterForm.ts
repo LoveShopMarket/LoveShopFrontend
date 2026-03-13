@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserRegisterDTO } from './UserRegisterDTO'
+import { UserRegisterDTO } from './UserRegisterDto'
 import { register } from '../api/registerApi'
 import { PasswordError } from '@/shared/Errors/PasswordError'
 
@@ -24,7 +24,7 @@ export function useRegisterForm() {
     if (!userRegisterDTO.isSuccess) {
       errors.value = []
 
-      userRegisterDTO.getErrors.forEach(err => {
+      userRegisterDTO.getErrors.forEach((err: Error) => {
         if (err instanceof PasswordError) {
           errors.value.push(err.message)
         }
