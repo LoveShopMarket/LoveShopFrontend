@@ -15,8 +15,13 @@ export async function register(email: string, password: string): Promise<Result<
           console.log(`Data: ${error.response?.data}`)
 
           const errorsObject = error.response?.data.errors
-          const errors = Object.entries(errorsObject)
-            .map(([_, value]) => value.join('\n'))
+            const errors = Object.entries(errorsObject || {})
+            .map(([, value]) => {
+              if (Array.isArray(value)) {
+                return value.join('\n');
+              }
+              return String(value);
+            })
             .join('\n');
           return Result.fail<boolean>([new Error(errors)])
         }
