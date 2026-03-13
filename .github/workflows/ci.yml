@@ -1,4 +1,4 @@
-name: CI/CD Vue
+name: CI/CD
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  vue-checks:
+  vue:
     runs-on: ubuntu-latest
     
     steps:
