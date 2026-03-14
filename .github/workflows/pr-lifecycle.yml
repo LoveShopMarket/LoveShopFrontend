@@ -10,12 +10,24 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
+      # Debug шаг для проверки секретов (временный)
+      - name: Debug secrets
+        run: |
+          echo "🔍 Проверка секретов:"
+          echo "CHAT_ID задан: ${{ secrets.TELEGRAM_CHAT_ID != '' && '✅' || '❌' }}"
+          echo "THREAD_ID задан: ${{ secrets.TELEGRAM_THREAD_ID != '' && '✅' || '❌' }}"
+          if [ "${{ secrets.TELEGRAM_THREAD_ID != '' }}" = "true" ]; then
+            echo "THREAD_ID значение: '${{ secrets.TELEGRAM_THREAD_ID }}'"
+          fi
+        continue-on-error: true  # не останавливаем workflow если debug упадет
+
+      # Основная отправка
       - name: Send Telegram notification
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message_thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+          message_thread_id: ${{ secrets.TELEGRAM_THREAD_TOPIC }}
           message: |
             ${{ 
               github.event_name == 'pull_request' && github.event.action == 'opened' && '🆕 **НОВЫЙ PR**' ||
