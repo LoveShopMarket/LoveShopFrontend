@@ -1,0 +1,17 @@
+services:
+  vue-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    develop:
+      watch:
+        - path: ./src
+          action: sync
+          target: /app/src
+        - path: package.json
+          action: rebuild
