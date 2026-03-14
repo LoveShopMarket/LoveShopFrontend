@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Telegram notification
-        uses: appleboy/telegram-action@v1.1.0
+        uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message_thread_id: 337
+          message_thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
           message: |
             ${{ 
               github.event_name == 'pull_request' && github.event.action == 'opened' && '🆕 **НОВЫЙ PR**' ||
