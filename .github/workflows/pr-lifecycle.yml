@@ -1,4 +1,4 @@
-name: PR Lifecycle Notifications
+name: PR Notifications
 
 on:
   pull_request:
@@ -10,41 +10,36 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      # Debug шаг для проверки секретов (временный)
-      - name: Debug secrets
+      - name: Telegram notify
         run: |
-          echo "🔍 Проверка секретов:"
-          echo "CHAT_ID задан: ${{ secrets.TELEGRAM_CHAT_ID != '' && '✅' || '❌' }}"
-          echo "THREAD_ID задан: ${{ secrets.TELEGRAM_THREAD_TOPIC != '' && '✅' || '❌' }}"
-          if [ "${{ secrets.TELEGRAM_THREAD_TOPIC != '' }}" = "true" ]; then
-            echo "THREAD_ID значение: '${{ secrets.TELEGRAM_THREAD_TOPIC }}'"
+          # Определяем тип события
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            if [ "${{ github.event.action }}" = "opened" ]; then
+              TEXT="🆕 PR opened: ${{ github.event.pull_request.title }}"
+            elif [ "${{ github.event.action }}" = "reopened" ]; then
+              TEXT="🔄 PR reopened: ${{ github.event.pull_request.title }}"
+            elif [ "${{ github.event.action }}" = "closed" ]; then
+              if [ "${{ github.event.pull_request.merged }}" = "true" ]; then
+                TEXT="🎉 PR merged: ${{ github.event.pull_request.title }}"
+              else
+                TEXT="❌ PR closed: ${{ github.event.pull_request.title }}"
+              fi
+            fi
+          elif [ "${{ github.event_name }}" = "pull_request_review" ]; then
+            if [ "${{ github.event.review.state }}" = "approved" ]; then
+              TEXT="✅ PR approved: ${{ github.event.pull_request.title }}"
+            elif [ "${{ github.event.review.state }}" = "changes_requested" ]; then
+              TEXT="🔄 Changes requested: ${{ github.event.pull_request.title }}"
+            else
+              TEXT="💬 New review: ${{ github.event.pull_request.title }}"
+            fi
           fi
-        continue-on-error: true  # не останавливаем workflow если debug упадет
 
-      # Основная отправка
-      - name: Send Telegram notification
-        uses: appleboy/telegram-action@v1.0.1
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message_thread_id: "${{ secrets.TELEGRAM_THREAD_TOPIC }}"
-          message: |
-            ${{ 
-              github.event_name == 'pull_request' && github.event.action == 'opened' && '🆕 **НОВЫЙ PR**' ||
-              github.event_name == 'pull_request' && github.event.action == 'reopened' && '🔄 **PR ВОЗОБНОВЛЕН**' ||
-              github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && '🎉 **PR СМЕРЖЕН**' ||
-              github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false && '❌ **PR ЗАКРЫТ**' ||
-              github.event_name == 'pull_request_review' && github.event.review.state == 'approved' && '✅ **PR ОДОБРЕН**' ||
-              github.event_name == 'pull_request_review' && github.event.review.state == 'changes_requested' && '🔄 **ЗАПРОШЕНЫ ИЗМЕНЕНИЯ**' ||
-              github.event_name == 'pull_request_review' && '💬 **НОВЫЙ КОММЕНТАРИЙ**'
-            }}
-            
-            📦 **Репозиторий:** ${{ github.repository }}
-            📌 **Название:** ${{ github.event.pull_request.title }}
-            👤 **Автор:** @${{ github.event.pull_request.user.login }}
-            🌿 **Ветка:** ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}
-            
-            ${{ github.event.review && format('👥 **Ревьювер:** @{0}', github.event.review.user.login) || '' }}
-            ${{ github.event.review && github.event.review.body != '' && format('📝 **Комментарий:** {0}', github.event.review.body) || '' }}
-            
-            🔗 ${{ github.event.pull_request.html_url }}
+          # Добавляем ссылку
+          TEXT="$TEXT%0A🔗 ${{ github.event.pull_request.html_url }}"
+
+          # Отправляем
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d message_thread_id="${{ secrets.TELEGRAM_THREAD_TOPIC }}" \
+            -d text="$TEXT"
