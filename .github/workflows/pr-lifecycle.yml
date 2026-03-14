@@ -15,9 +15,9 @@ jobs:
         run: |
           echo "🔍 Проверка секретов:"
           echo "CHAT_ID задан: ${{ secrets.TELEGRAM_CHAT_ID != '' && '✅' || '❌' }}"
-          echo "THREAD_ID задан: ${{ secrets.TELEGRAM_THREAD_ID != '' && '✅' || '❌' }}"
-          if [ "${{ secrets.TELEGRAM_THREAD_ID != '' }}" = "true" ]; then
-            echo "THREAD_ID значение: '${{ secrets.TELEGRAM_THREAD_ID }}'"
+          echo "THREAD_ID задан: ${{ secrets.TELEGRAM_THREAD_TOPIC != '' && '✅' || '❌' }}"
+          if [ "${{ secrets.TELEGRAM_THREAD_TOPIC != '' }}" = "true" ]; then
+            echo "THREAD_ID значение: '${{ secrets.TELEGRAM_THREAD_TOPIC }}'"
           fi
         continue-on-error: true  # не останавливаем workflow если debug упадет
 
