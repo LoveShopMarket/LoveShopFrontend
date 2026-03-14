@@ -23,7 +23,7 @@ jobs:
 
       # Основная отправка
       - name: Send Telegram notification
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v0.1.10
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
