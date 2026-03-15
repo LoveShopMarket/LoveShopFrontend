@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize]
   workflow_run:
-    workflows: ["CI/CD", ".NET CI"]
+    workflows: ["CI/CD", "CD"]
     types: [completed]
     branches: [develop, main]
 
@@ -27,7 +27,6 @@ jobs:
         id: get-pr
         if: github.event_name == 'workflow_run'
         run: |
-          # Получаем номер PR из коммита
           PR_NUMBER=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/commits/${{ github.event.workflow_run.head_commit.id }}/pulls" | \
             jq -r '.[0].number')
@@ -38,58 +37,67 @@ jobs:
               "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" | \
               jq -r '.title')
             echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
+            PR_AUTHOR=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" | \
+              jq -r '.user.login')
+            echo "pr_author=$PR_AUTHOR" >> $GITHUB_OUTPUT
           fi
 
-      - name: Send CI result notification
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message_thread_id: ${{ secrets.TELEGRAM_THREAD_TOPIC }} 
-          message: |
-            ${{ 
-              (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || 
-              (github.event_name == 'pull_request' && steps.wait-for-ci.outputs.conclusion == 'success') 
-              && '✅ **ПРОВЕРКИ ПРОЙДЕНЫ**' ||
-              
-              (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure') || 
-              (github.event_name == 'pull_request' && steps.wait-for-ci.outputs.conclusion == 'failure') 
-              && '❌ **ПРОВЕРКИ УПАЛИ**' ||
-              
-              (github.event_name == 'pull_request' && steps.wait-for-ci.outputs.conclusion == 'timed_out')
-              && '⏰ **ПРОВЕРКИ ЗАНЯЛИ СЛИШКОМ МНОГО ВРЕМЕНИ**'
-            }}
-            
-            📦 **Репозиторий:** ${{ github.repository }}
-            📌 **PR:** ${{ 
-              github.event.pull_request.title || 
-              steps.get-pr.outputs.pr_title || 
-              github.event.workflow_run.display_title 
-            }}
-            ${{ (github.event.pull_request.number || steps.get-pr.outputs.pr_number) && 
-              format(' #{0}', github.event.pull_request.number || steps.get-pr.outputs.pr_number) || '' }}
-            
-            👤 **Автор:** @${{ 
-              github.event.pull_request.user.login || 
-              github.event.workflow_run.actor.login 
-            }}
-            
-            ${{ github.event_name == 'workflow_run' && format('⚙️ **Workflow:** {0}', github.event.workflow_run.name) || '' }}
-            ${{ github.event_name == 'workflow_run' && format('📊 **Результат:** {0}', github.event.workflow_run.conclusion) || '' }}
-            
-            ${{ 
-              (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure') ||
-              (github.event_name == 'pull_request' && steps.wait-for-ci.outputs.conclusion == 'failure')
-              && '🔴 **Нужно исправить ошибки!**' || 
-              
-              (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
-              (github.event_name == 'pull_request' && steps.wait-for-ci.outputs.conclusion == 'success')
-              && '🟢 **Можно мержить!**' || ''
-            }}
-            
-            🔗 ${{ 
-              github.event.pull_request.html_url || 
-              (steps.get-pr.outputs.pr_number && 
-                format('https://github.com/{0}/pull/{1}', github.repository, steps.get-pr.outputs.pr_number)) ||
-              github.event.workflow_run.html_url 
-            }}
+      - name: Send CI result notification via curl
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            CONCLUSION="${{ github.event.workflow_run.conclusion }}"
+            if [ "$CONCLUSION" = "success" ]; then
+              STATUS="✅ **ПРОВЕРКИ ПРОЙДЕНЫ**"
+              RESULT_LINE="🟢 **Можно мержить!**"
+            else
+              STATUS="❌ **ПРОВЕРКИ УПАЛИ**"
+              RESULT_LINE="🔴 **Нужно исправить ошибки!**"
+            fi
+            WORKFLOW_LINE="⚙️ **Workflow:** ${{ github.event.workflow_run.name }}%0A📊 **Результат:** $CONCLUSION"
+          else
+            CONCLUSION="${{ steps.wait-for-ci.outputs.conclusion }}"
+            if [ "$CONCLUSION" = "success" ]; then
+              STATUS="✅ **ПРОВЕРКИ ПРОЙДЕНЫ**"
+              RESULT_LINE="🟢 **Можно мержить!**"
+            elif [ "$CONCLUSION" = "failure" ]; then
+              STATUS="❌ **ПРОВЕРКИ УПАЛИ**"
+              RESULT_LINE="🔴 **Нужно исправить ошибки!**"
+            else
+              STATUS="⏰ **ПРОВЕРКИ ЗАНЯЛИ СЛИШКОМ МНОГО ВРЕМЕНИ**"
+              RESULT_LINE=""
+            fi
+            WORKFLOW_LINE=""
+          fi
+
+          PR_TITLE="${{ github.event.pull_request.title || steps.get-pr.outputs.pr_title || github.event.workflow_run.display_title }}"
+          PR_NUMBER="${{ github.event.pull_request.number || steps.get-pr.outputs.pr_number }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login || steps.get-pr.outputs.pr_author || github.event.workflow_run.actor.login }}"
+          
+          if [ -n "$PR_NUMBER" ]; then
+            PR_LINK="🔗 https://github.com/${{ github.repository }}/pull/$PR_NUMBER"
+          else
+            PR_LINK="🔗 ${{ github.event.workflow_run.html_url }}"
+          fi
+
+          MESSAGE="$STATUS%0A%0A"
+          MESSAGE="$MESSAGE📦 **Репозиторий:** ${{ github.repository }}%0A"
+          MESSAGE="$MESSAGE📌 **PR:** $PR_TITLE #$PR_NUMBER%0A"
+          MESSAGE="$MESSAGE👤 **Автор:** $PR_AUTHOR%0A"
+          MESSAGE="$MESSAGE%0A"
+          
+          if [ -n "$WORKFLOW_LINE" ]; then
+            MESSAGE="$MESSAGE$WORKFLOW_LINE%0A"
+          fi
+          
+          if [ -n "$RESULT_LINE" ]; then
+            MESSAGE="$MESSAGE$RESULT_LINE%0A"
+          fi
+          
+          MESSAGE="$MESSAGE%0A$PR_LINK"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d message_thread_id="${{ secrets.TELEGRAM_THREAD_TOPIC }}" \
+            -d text="$MESSAGE" \
+            -d parse_mode="Markdown"
