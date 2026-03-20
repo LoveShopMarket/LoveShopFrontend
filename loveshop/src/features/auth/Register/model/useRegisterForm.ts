@@ -24,7 +24,7 @@ export function useRegisterForm() {
     if (!userRegisterDTO.isSuccess) {
       errors.value = []
 
-      userRegisterDTO.getErrors.forEach(err => {
+      userRegisterDTO.getErrors.forEach((err: Error) => {
         if (err instanceof PasswordError) {
           errors.value.push(err.message)
         }
